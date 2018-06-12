@@ -26,7 +26,6 @@ class PostController extends \App\Http\Controllers\Controller {
 
     public function index(){
       $posts = $this->post_r->getPosts()->paginate(10);
-      //$posts = $this->post_model->newQuery()->with('category')->paginate(10);
       return view('admin.posts.index',[
         'posts' => $posts
       ]);
@@ -36,12 +35,15 @@ class PostController extends \App\Http\Controllers\Controller {
       $post = new Post();
       $categories = Category::pluck('name', 'id');
       $users = User::pluck('name', 'id');
-      return view('admin.posts.new', compact('post', 'categories', 'users'));
+      return view('admin.posts.new', [
+          'post' => $post,
+          'categories' => $categories,
+          'users' => $users
+      ]);
     }
 
     public function store(PostRequest $request){
-      $this->post_model->newQuery()->create($request->all());
-      //$this->post_r->CreatePost($request->all());
+      $this->post_model->newQuery()->create($request->all())
       return redirect()->route('admin.posts.index')->with('success','Votre article a été crée');
     }
 

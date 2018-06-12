@@ -43,7 +43,7 @@ class PostController extends \App\Http\Controllers\Controller {
     }
 
     public function store(PostRequest $request){
-      $this->post_model->newQuery()->create($request->all())
+      $this->post_model->newQuery()->create($request->all());
       return redirect()->route('admin.posts.index')->with('success','Votre article a été crée');
     }
 

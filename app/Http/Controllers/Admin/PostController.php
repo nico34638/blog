@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 use App\Repository\PostRepository;
 
+
 class PostController extends \App\Http\Controllers\Controller {
 
     private $post_model;
@@ -25,6 +26,7 @@ class PostController extends \App\Http\Controllers\Controller {
     }
 
     public function index(){
+      $this->authorize('view', Post::class);
       $posts = $this->post_r->getPosts()->paginate(10);
       return view('admin.posts.index',[
         'posts' => $posts
@@ -32,6 +34,7 @@ class PostController extends \App\Http\Controllers\Controller {
     }
 
     public function create(){
+      $this->authorize('create', Post::class);
       $post = new Post();
       $categories = Category::pluck('name', 'id');
       $users = User::pluck('name', 'id');
@@ -43,11 +46,12 @@ class PostController extends \App\Http\Controllers\Controller {
     }
 
     public function store(PostRequest $request){
-      $this->post_model->newQuery()->create($request->all());
+      $this->post_model->newQuery()->create($this->params($request));
       return redirect()->route('admin.posts.index')->with('success','Votre article a été crée');
     }
 
     public function edit(Post $post){
+      $this->authorize('update', $post);
       $categories = $this->category_model->newQuery()->pluck('name','id');
       $users = $this->user_model->newQuery()->pluck('name', 'id');
       return view('admin.posts.new',[
@@ -58,13 +62,26 @@ class PostController extends \App\Http\Controllers\Controller {
     }
 
     public function update(PostRequest $request, Post $post){
-      $post->update($request->all());
+      $this->authorize('update', $post);
+      $post->update($this->params($request));
       return redirect()->route('admin.posts.index')->with('success','Votre article a été modifié');
     }
 
     public function destroy(Post $post){
+      $this->authorize('delete', $post);
       $post->delete();
       return redirect()->route('admin.posts.index')->with('success','Article supprimer');
     }
 
+    private function params($request){
+      $user = Auth::user();
+      if($user->can('changeOwner', Post::class)){
+        return $request->all();
+      }
+      else{
+        $params = $request->except('user_id');
+        $params['user_id'] = $user->id;
+        return $params;
+      }
+    }
 }

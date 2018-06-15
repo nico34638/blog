@@ -25,11 +25,14 @@
           <td>{{ $post->category->name }}</td>
           <td>{{ $post->created_at->format('d/m/Y H:i') }}</td>
           <td>
+            @can('update', $post)
             <a href="{{ route('admin.posts.edit', ['id' => $post->id]) }}" class="btn btn-primary">Edit</a>
-
+            @endcan
+            @can('delete', $post)
             {!! Form::model($post, ['method' => 'DELETE', 'route' => ['admin.posts.destroy', $post], 'style' => 'display:inline;']) !!}
                 {!! Form::submit('Delete', ['class' => 'btn btn-danger']) !!}
             {!! Form::close() !!}
+            @endcan
           </td>
         </tr>
         @endforeach

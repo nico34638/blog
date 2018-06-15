@@ -31,6 +31,7 @@
                 @endif
             </div>
         </div>
+        @can('changeOwner', $post)
         <div class="col-sm-6">
             <div class="form-group @if($errors->first('user_id')) has-danger @endif">
                 {!! Form::label('user_id', 'User') !!}
@@ -40,6 +41,7 @@
                 @endif
             </div>
         </div>
+        @endcan
     </div>
     <div class="form-group @if($errors->first('content')) has-danger @endif">
         {!! Form::label('content', 'Content') !!}
